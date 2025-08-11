@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import GoogleSignInButton from './GoogleSignInButton'
 
 interface SignUpFormProps {
   onToggleMode: () => void
@@ -100,6 +101,23 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
           <p className="text-center text-gray-600 dark:text-gray-400">
             新しいアカウントを作成してください
           </p>
+        </div>
+
+        {/* Google Sign Up */}
+        <div className="mb-6">
+          <GoogleSignInButton 
+            mode="signup"
+            onError={(error) => setError(error)}
+          />
+        </div>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">または</span>
+          </div>
         </div>
 
         <form onSubmit={handleSignUp} className="space-y-6">

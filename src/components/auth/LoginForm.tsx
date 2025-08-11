@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import GoogleSignInButton from './GoogleSignInButton'
 
 interface LoginFormProps {
   onToggleMode: () => void
@@ -48,6 +49,23 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
           <p className="text-center text-gray-600 dark:text-gray-400">
             アカウントにログインしてください
           </p>
+        </div>
+
+        {/* Google Sign In */}
+        <div className="mb-6">
+          <GoogleSignInButton 
+            mode="signin"
+            onError={(error) => setError(error)}
+          />
+        </div>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">または</span>
+          </div>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
