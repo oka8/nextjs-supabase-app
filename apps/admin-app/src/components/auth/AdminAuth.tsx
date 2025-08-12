@@ -10,6 +10,7 @@ interface AdminAuthProps {
 export default function AdminAuth({ children }: AdminAuthProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -28,6 +29,7 @@ export default function AdminAuth({ children }: AdminAuthProps) {
   ]
 
   useEffect(() => {
+    setIsMounted(true)
     checkAuthStatus()
   }, [])
 
@@ -79,7 +81,8 @@ export default function AdminAuth({ children }: AdminAuthProps) {
     setIsAuthenticated(false)
   }
 
-  if (isLoading) {
+  // ハイドレーションエラーを防ぐため、クライアントサイドでマウント後のみレンダリング
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
