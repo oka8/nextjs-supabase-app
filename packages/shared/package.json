@@ -1,0 +1,22 @@
+{
+  "name": "@app/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and components for user and admin apps",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18",
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}

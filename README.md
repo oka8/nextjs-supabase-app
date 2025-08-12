@@ -1,141 +1,222 @@
-# Next.js + Supabase Starter App
+# Next.js + Supabase Monorepo
 
-このプロジェクトは、Next.js 15 と Supabase を統合したスターターアプリケーションです。開発環境と本番環境の両方に対応しており、Vercel での簡単なデプロイが可能です。
+このプロジェクトは、Next.js 15 と Supabase を使用したモノレポ構成のアプリケーションです。ユーザー向けアプリと管理画面を独立してデプロイできるように設計されています。
 
-## 技術スタック
-
-- **Next.js 15** - React フレームワーク（App Router、TypeScript、Tailwind CSS）
-- **Supabase** - BaaS（Backend as a Service）プラットフォーム
-- **Vercel** - ホスティングプラットフォーム
-- **TypeScript** - 型安全性の向上
-- **Tailwind CSS** - ユーティリティファーストCSS
-
-## 機能
-
-- ✅ Supabase 接続ステータスの可視化
-- ✅ 開発・本番環境の自動切り替え
-- ✅ TypeScript サポート
-- ✅ Tailwind CSS によるスタイリング
-- ✅ ESLint による静的解析
-
-## 環境構成
-
-| 環境 | Supabase | URL | 設定場所 |
-|------|----------|-----|----------|
-| 開発 | ローカルDocker | http://127.0.0.1:54321 | .env.local |
-| 本番 | Supabaseクラウド | https://プロジェクト.supabase.co | Vercel環境変数 |
-
-## セットアップ
-
-### 1. 依存関係のインストール
-
-```bash
-npm install
-```
-
-### 2. 環境変数の設定
-
-開発環境用の `.env.local` ファイルは既に含まれています。本番環境の設定は Vercel デプロイ時に行います。
-
-### 3. ローカルSupabaseの起動（オプション）
-
-ローカルでSupabaseを使用する場合：
-
-```bash
-# Supabase CLI をインストール（未インストールの場合）
-npm install -g supabase
-
-# Supabase を初期化
-supabase init
-
-# ローカル Supabase を起動
-supabase start
-```
-
-### 4. 開発サーバーの起動
-
-```bash
-npm run dev
-```
-
-[http://localhost:3000](http://localhost:3000) をブラウザで開いて、Supabase接続ステータスを確認してください。
-
-## プロジェクト構造
+## 📁 プロジェクト構成
 
 ```
 nextjs-supabase-app/
-├── src/
-│   └── app/
-│       ├── layout.tsx
-│       ├── page.tsx          # メインページ（接続テスト付き）
-│       └── globals.css
-├── lib/
-│   └── supabase.ts          # Supabaseクライアント設定
-├── public/                   # 静的アセット
-├── .env.local               # 環境変数（開発用）
-└── package.json
+├── apps/
+│   ├── user-app/          # ユーザー向けアプリケーション
+│   └── admin-app/         # 管理画面アプリケーション
+├── packages/
+│   └── shared/            # 共通ライブラリ
+├── package.json           # モノレポ管理
+└── README.md             # このファイル
 ```
 
-## Vercelデプロイ
+## 🚀 アプリケーション構成
 
-### 1. GitHubリポジトリとの連携
+### ユーザーアプリ (`apps/user-app`)
+- **目的**: 一般ユーザー向けのフロントエンド
+- **機能**: 
+  - ユーザー認証（メール・Google OAuth）
+  - ユーザーダッシュボード
+  - レスポンシブデザイン
+- **独立デプロイ**: 可能
+
+### 管理画面 (`apps/admin-app`)
+- **目的**: システム管理者向けの管理画面
+- **機能**:
+  - システム監視ダッシュボード
+  - ユーザー管理機能
+  - システム設定
+- **独立デプロイ**: 可能
+
+### 共通ライブラリ (`packages/shared`)
+- **目的**: 両アプリで共有するコンポーネント・ロジック
+- **内容**:
+  - Supabase クライアント設定
+  - 認証コンテキスト
+  - 共通認証コンポーネント
+
+## 🛠️ 開発環境セットアップ
+
+### 前提条件
+- Node.js 18以上
+- npm または yarn
+- Supabase プロジェクト
+
+### 初期セットアップ
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/nextjs-supabase-app.git
-git push -u origin main
+# リポジトリをクローン
+git clone https://github.com/oka8/nextjs-supabase-app.git
+cd nextjs-supabase-app
+
+# 全体の依存関係をインストール
+npm run install:all
+
+# 環境変数ファイルをコピー（必要に応じて編集）
+cp .env.local apps/user-app/
+cp .env.local apps/admin-app/
 ```
 
-### 2. Vercelでのインポート
-
-1. [Vercel](https://vercel.com) にログイン
-2. GitHubリポジトリをインポート
-3. 本番用Supabaseの環境変数を設定
-
-### 3. 環境変数の設定
-
-Vercel Dashboard で以下の環境変数を設定：
-
-- `NEXT_PUBLIC_SUPABASE_URL`: `https://YOUR_PROJECT_REF.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 本番用匿名キー
-
-## Supabase本番プロジェクトの作成
+### 開発サーバー起動
 
 ```bash
-# Supabaseにログイン
-supabase login
+# ユーザーアプリの開発サーバー
+npm run dev:user
 
-# 本番プロジェクトを作成
-supabase projects create nextjs-supabase-app-prod --org-id YOUR_ORG_ID --db-password "SecurePass123!" --region ap-northeast-1
+# 管理画面の開発サーバー
+npm run dev:admin
 
-# API キーを取得
-supabase projects api-keys --project-ref YOUR_PROJECT_REF
+# 共通ライブラリの開発（型チェック）
+npm run dev:shared
 ```
 
-## 開発ワークフロー
+## 🌐 デプロイ
 
-1. 新機能の開発はローカルSupabaseで行う
-2. データベーススキーマの変更は `supabase/migrations` で管理
-3. 本番反映前にステージング環境でテスト
-4. Vercel の自動デプロイで本番反映
+### 独立デプロイのメリット
+- **スケーラビリティ**: 各アプリを独立してスケーリング可能
+- **セキュリティ**: 管理画面への一般ユーザーアクセスを完全に分離
+- **開発効率**: 各チームが独立して開発・デプロイ可能
+- **障害分離**: 一方のアプリの障害が他方に影響しない
 
-## トラブルシューティング
+### Vercel デプロイ
 
-### Supabase接続エラー
+#### ユーザーアプリのデプロイ
+```bash
+# ユーザーアプリディレクトリに移動
+cd apps/user-app
 
-- ローカル環境: `supabase start` でDockerコンテナが起動しているか確認
-- 本番環境: Vercel の環境変数が正しく設定されているか確認
+# Vercelにデプロイ
+vercel --prod
 
-### ポート競合
+# または、ルートから
+npm run deploy:user
+```
 
-開発サーバーのポートが競合する場合、Next.js は自動的に別のポートを使用します。
+#### 管理画面のデプロイ
+```bash
+# 管理画面ディレクトリに移動
+cd apps/admin-app
 
-## 参考リンク
+# Vercelにデプロイ
+vercel --prod
+
+# または、ルートから
+npm run deploy:admin
+```
+
+### 環境変数設定
+
+各アプリで以下の環境変数が必要です：
+
+```bash
+# Supabase設定
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# サイトURL（OAuth用）
+NEXT_PUBLIC_SITE_URL=https://your-app-domain.vercel.app
+```
+
+## 📝 開発ワークフロー
+
+### 共通コンポーネントの変更
+1. `packages/shared` で変更を実装
+2. 両アプリで動作テスト
+3. 共通ライブラリをコミット
+4. 必要に応じて各アプリをデプロイ
+
+### ユーザーアプリのみの変更
+1. `apps/user-app` で変更を実装
+2. ユーザーアプリのみをデプロイ
+3. 管理画面への影響なし
+
+### 管理画面のみの変更
+1. `apps/admin-app` で変更を実装
+2. 管理画面のみをデプロイ
+3. ユーザーアプリへの影響なし
+
+## 🔧 使用可能なコマンド
+
+```bash
+# 開発
+npm run dev:user          # ユーザーアプリ開発サーバー
+npm run dev:admin         # 管理画面開発サーバー
+npm run dev:shared        # 共通ライブラリ監視
+
+# ビルド
+npm run build:user        # ユーザーアプリビルド
+npm run build:admin       # 管理画面ビルド
+npm run build:shared      # 共通ライブラリビルド
+
+# リント
+npm run lint:user         # ユーザーアプリリント
+npm run lint:admin        # 管理画面リント
+
+# デプロイ
+npm run deploy:user       # ユーザーアプリデプロイ
+npm run deploy:admin      # 管理画面デプロイ
+
+# セットアップ
+npm run install:all       # 全ての依存関係インストール
+```
+
+## 🌍 本番環境URL
+
+### ユーザーアプリ
+- **開発**: http://localhost:3001
+- **本番**: https://your-user-app.vercel.app
+
+### 管理画面
+- **開発**: http://localhost:3000
+- **本番**: https://your-admin-app.vercel.app
+
+## 🛡️ セキュリティ考慮事項
+
+### アクセス制御
+- **ユーザーアプリ**: 一般ユーザー向け、公開アクセス
+- **管理画面**: 管理者専用、アクセス制限必要
+
+### 認証分離
+- 両アプリで同じSupabaseプロジェクトを使用
+- 役割ベースのアクセス制御を実装推奨
+- 管理画面アクセスには追加認証を検討
+
+## 📚 技術スタック
+
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Authentication**: Supabase Auth (Email + Google OAuth)
+- **Database**: Supabase PostgreSQL
+- **Deployment**: Vercel
+- **Monorepo**: npm workspaces
+
+## 🤝 開発チーム構成案
+
+### チーム分離例
+- **ユーザーチーム**: `apps/user-app` の開発・運用
+- **管理チーム**: `apps/admin-app` の開発・運用
+- **共通チーム**: `packages/shared` の開発・メンテナンス
+
+### ブランチ戦略例
+- `main`: 本番環境
+- `develop`: 開発統合
+- `feature/user-*`: ユーザーアプリ機能
+- `feature/admin-*`: 管理画面機能
+- `feature/shared-*`: 共通ライブラリ機能
+
+## 📞 サポート
+
+問題や質問がある場合は、以下を参照してください：
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Documentation](https://supabase.com/docs)
 - [Vercel Documentation](https://vercel.com/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
-## ライセンス
+---
 
-MIT License
+**ライセンス**: MIT
