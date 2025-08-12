@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { mockAuth, isSupabaseAvailable } from '@/lib/mockAuth'
 
 interface AdminAuthProps {
   children: React.ReactNode
@@ -14,6 +15,7 @@ export default function AdminAuth({ children }: AdminAuthProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [useSupabase, setUseSupabase] = useState(true)
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
@@ -30,12 +32,32 @@ export default function AdminAuth({ children }: AdminAuthProps) {
 
   useEffect(() => {
     setIsMounted(true)
-    checkAuthStatus()
+    initializeAuth()
   }, [])
+
+  const initializeAuth = async () => {
+    // Supabaseの可用性をチェック
+    const supabaseAvailable = await isSupabaseAvailable()
+    setUseSupabase(supabaseAvailable)
+    
+    if (!supabaseAvailable) {
+      console.log('🔧 ローカルSupabaseが利用できません。モック認証を使用します。')
+    }
+    
+    checkAuthStatus()
+  }
 
   const checkAuthStatus = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      let session = null
+      
+      if (useSupabase) {
+        const { data } = await supabase.auth.getSession()
+        session = data.session
+      } else {
+        const { data } = await mockAuth.getSession()
+        session = data.session
+      }
       
       if (session?.user?.email && adminEmails.includes(session.user.email)) {
         setIsAuthenticated(true)
@@ -55,10 +77,23 @@ export default function AdminAuth({ children }: AdminAuthProps) {
     setError('')
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      let data, error
+      
+      if (useSupabase) {
+        const result = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        data = result.data
+        error = result.error
+      } else {
+        const result = await mockAuth.signInWithPassword({
+          email,
+          password,
+        })
+        data = result.data
+        error = result.error
+      }
 
       if (error) {
         setError('ログインに失敗しました: ' + error.message)
@@ -69,7 +104,11 @@ export default function AdminAuth({ children }: AdminAuthProps) {
         setIsAuthenticated(true)
       } else {
         setError('管理者権限がありません。')
-        await supabase.auth.signOut()
+        if (useSupabase) {
+          await supabase.auth.signOut()
+        } else {
+          await mockAuth.signOut()
+        }
       }
     } catch (error) {
       setError('ログインエラーが発生しました。')
@@ -77,7 +116,11 @@ export default function AdminAuth({ children }: AdminAuthProps) {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    if (useSupabase) {
+      await supabase.auth.signOut()
+    } else {
+      await mockAuth.signOut()
+    }
     setIsAuthenticated(false)
   }
 
@@ -156,7 +199,12 @@ export default function AdminAuth({ children }: AdminAuthProps) {
             <p className="text-sm text-blue-800">
               <strong>テスト用アカウント:</strong><br />
               メール: admin@test.com<br />
-              パスワード: 任意のパスワードでアカウントを作成してください
+              パスワード: pass1word!<br />
+              {!useSupabase && (
+                <span className="text-orange-600">
+                  <br />📝 モック認証モードで動作中
+                </span>
+              )}
             </p>
           </div>
         </div>
