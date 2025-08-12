@@ -4,8 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { createClient } from '@supabase/supabase-js'
+import AdminAuth from '@/components/auth/AdminAuth'
 
-export default function AdminHome() {
+function AdminDashboard() {
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const [loading, setLoading] = useState(true)
   const [userCount, setUserCount] = useState<number>(0)
@@ -267,5 +268,13 @@ export default function AdminHome() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function AdminHome() {
+  return (
+    <AdminAuth>
+      <AdminDashboard />
+    </AdminAuth>
   )
 }
