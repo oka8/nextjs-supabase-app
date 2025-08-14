@@ -34,7 +34,7 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       })
@@ -44,7 +44,7 @@ export default function SignUpForm({ onToggleMode }: SignUpFormProps) {
       } else {
         setSuccess(true)
       }
-    } catch (error) {
+    } catch {
       setError('アカウント作成中にエラーが発生しました')
     } finally {
       setLoading(false)

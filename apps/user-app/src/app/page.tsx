@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/contexts/AuthContext"
+import ClientWrapper from "@/components/ClientWrapper"
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(false)
@@ -14,7 +15,7 @@ export default function Home() {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession()
+        await supabase.auth.getSession()
         setIsConnected(true)
       } catch (error) {
         console.log('Supabase connection error:', error)
@@ -52,29 +53,42 @@ export default function Home() {
         </div>
 
         {/* 認証状態表示 */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 w-full max-w-md">
-          <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full ${authLoading ? 'bg-yellow-500' : user ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                認証状態: {authLoading ? '確認中...' : user ? 'ログイン済み' : '未ログイン'}
+        <ClientWrapper
+          fallback={
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 w-full max-w-md">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  認証状態: 読み込み中...
+                </div>
+              </div>
+            </div>
+          }
+        >
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 w-full max-w-md">
+            <div className="flex items-center gap-3">
+              <div className={`w-3 h-3 rounded-full ${authLoading ? 'bg-yellow-500' : user ? 'bg-green-500' : 'bg-gray-500'}`}></div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  認証状態: {authLoading ? '確認中...' : user ? 'ログイン済み' : '未ログイン'}
+                </div>
+                {user && (
+                  <div className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                    {user.email}
+                  </div>
+                )}
               </div>
               {user && (
-                <div className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                  {user.email}
-                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 px-2 py-1 rounded transition-colors"
+                >
+                  ログアウト
+                </button>
               )}
             </div>
-            {user && (
-              <button
-                onClick={handleSignOut}
-                className="text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 px-2 py-1 rounded transition-colors"
-              >
-                ログアウト
-              </button>
-            )}
           </div>
-        </div>
+        </ClientWrapper>
 
         {/* Supabase接続状態 */}
         <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
@@ -91,41 +105,56 @@ export default function Home() {
           )}
         </div>
 
-        <div className="text-center sm:text-left">
-          {!user ? (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                アカウント機能を試してみましょう
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Supabase Authを使用したログイン・サインアップ機能
-              </p>
-              <Link
-                href="/auth"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
-              >
-                ログイン / アカウント作成
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                ようこそ！
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Next.js + Supabase アプリケーションにログインしています
-              </p>
-              <div className="flex gap-3">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
-                >
-                  ダッシュボードを見る
-                </Link>
+        <ClientWrapper
+          fallback={
+            <div className="text-center sm:text-left">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  読み込み中...
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  アプリケーションを準備中です
+                </p>
               </div>
             </div>
-          )}
-        </div>
+          }
+        >
+          <div className="text-center sm:text-left">
+            {!user ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  アカウント機能を試してみましょう
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Supabase Authを使用したログイン・サインアップ機能
+                </p>
+                <Link
+                  href="/auth"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+                >
+                  ログイン / アカウント作成
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  ようこそ！
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Next.js + Supabase アプリケーションにログインしています
+                </p>
+                <div className="flex gap-3">
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
+                  >
+                    ダッシュボードを見る
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </ClientWrapper>
 
         <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left max-w-md">
           <li className="mb-2 tracking-[-.01em]">

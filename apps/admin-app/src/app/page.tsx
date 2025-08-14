@@ -19,7 +19,7 @@ function AdminDashboard() {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession()
+        await supabase.auth.getSession()
         setIsConnected(true)
         
         // ユーザー数を取得（管理者権限が必要）
@@ -40,7 +40,7 @@ function AdminDashboard() {
     }
 
     checkConnection()
-  }, [])
+  }, [supabase])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

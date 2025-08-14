@@ -22,7 +22,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -32,7 +32,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
       } else {
         router.push('/')
       }
-    } catch (error) {
+    } catch {
       setError('ログイン中にエラーが発生しました')
     } finally {
       setLoading(false)

@@ -34,8 +34,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession()
@@ -63,7 +70,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [isClient])
 
   const signOut = async () => {
     try {

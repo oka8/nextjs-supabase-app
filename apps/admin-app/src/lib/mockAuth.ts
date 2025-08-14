@@ -134,11 +134,10 @@ export async function isSupabaseAvailable(): Promise<boolean> {
   
   try {
     const response = await fetch('http://127.0.0.1:54321/health', {
-      method: 'GET',
-      timeout: 1000
-    } as any)
+      method: 'GET'
+    })
     return response.ok
-  } catch (error) {
+  } catch {
     return false
   }
 }

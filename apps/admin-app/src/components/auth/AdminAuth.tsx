@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { mockAuth, isSupabaseAvailable } from '@/lib/mockAuth'
 
@@ -110,7 +110,7 @@ export default function AdminAuth({ children }: AdminAuthProps) {
           await mockAuth.signOut()
         }
       }
-    } catch (error) {
+    } catch {
       setError('ログインエラーが発生しました。')
     }
   }
